@@ -21,6 +21,8 @@ import android.util.Log;
 
 import com.phone.libphone.Phonenumber.PhoneNumber;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -57,7 +59,8 @@ public class PrefixFileReader {
     private void loadMappingFileProvider() {
         ObjectInputStream in = null;
         try {
-            InputStream source = mContext.getAssets().open(phonePrefixDataDirectory + "config");
+            File file = new File(phonePrefixDataDirectory + "config");
+            InputStream source = new FileInputStream(file);
             in = new ObjectInputStream(source);
             mappingFileProvider.readExternal(in);
         } catch (IOException e) {
@@ -83,7 +86,8 @@ public class PrefixFileReader {
     private void loadPhonePrefixMapFromFile(String fileName) {
         ObjectInputStream in = null;
         try {
-            InputStream source = mContext.getAssets().open(phonePrefixDataDirectory + fileName);
+            File file = new File(phonePrefixDataDirectory + fileName);
+            InputStream source = new FileInputStream(file);
             in = new ObjectInputStream(source);
             PhonePrefixMap map = new PhonePrefixMap(mContext);
             map.readExternal(in);

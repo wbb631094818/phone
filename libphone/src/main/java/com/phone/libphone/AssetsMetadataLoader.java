@@ -18,6 +18,8 @@ package com.phone.libphone;
 
 import android.content.res.AssetManager;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -32,7 +34,9 @@ public class AssetsMetadataLoader implements MetadataLoader {
   public InputStream loadMetadata(final String metadataFileName) {
     String assetFileName = metadataFileName.substring(1);
     try {
-      return assetManager.open(assetFileName);
+      File file = new File(assetFileName);
+      return new FileInputStream(file);
+//      return assetManager.open(assetFileName);
     } catch (final IOException exception) {
       return null;
     }

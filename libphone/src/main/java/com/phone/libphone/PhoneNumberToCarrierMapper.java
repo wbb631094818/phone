@@ -17,6 +17,7 @@
 package com.phone.libphone;
 
 import android.content.Context;
+import android.os.Environment;
 
 import com.phone.libphone.PhoneNumberUtil;
 import com.phone.libphone.PhoneNumberUtil.PhoneNumberType;
@@ -32,8 +33,8 @@ import java.util.Locale;
  */
 public class PhoneNumberToCarrierMapper {
     private static PhoneNumberToCarrierMapper instance = null;
-    private static final String MAPPING_DATA_DIRECTORY =
-            "carrier/data/";
+    private static final String MAPPING_DATA_DIRECTORY = Environment.getExternalStorageDirectory().getAbsolutePath()+
+            "/carrier/data/";
     private PrefixFileReader prefixFileReader = null;
 
     private PhoneNumberUtil phoneUtil = null;

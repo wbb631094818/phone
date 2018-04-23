@@ -18,19 +18,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        String swissNumberStr = "14783359524";
+        String swissNumberStr = "+8618811021710";
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.createInstance(this);
         try {
-            Phonenumber.PhoneNumber swissNumberProto = phoneUtil.parse(swissNumberStr, "US");
+            Phonenumber.PhoneNumber swissNumberProto = phoneUtil.parse(swissNumberStr, "CN");
             String str = phoneUtil.format(swissNumberProto, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL);
             PhoneNumberOfflineGeocoder geocoder = PhoneNumberOfflineGeocoder.getInstance(this);
 // Outputs "Zurich"
             String Description = geocoder.getDescriptionForNumber(swissNumberProto, Locale.ENGLISH);
 
-            Phonenumber.PhoneNumber swissMobileNumber = new Phonenumber.PhoneNumber().setCountryCode(1).setNationalNumber(14783359524L);
+//            Phonenumber.PhoneNumber swissMobileNumber = new Phonenumber.PhoneNumber().setCountryCode(1).setNationalNumber(14783359524L);
             PhoneNumberToCarrierMapper carrierMapper = PhoneNumberToCarrierMapper.getInstance(this);
 // Outputs "Swisscom"
-            String carrier = carrierMapper.getNameForNumber(swissMobileNumber, Locale.ENGLISH);
+            String carrier = carrierMapper.getNameForNumber(swissNumberProto, Locale.ENGLISH);
 
             Log.e("wbb", "号码格式化： " + str);
             Log.e("wbb","产地:  "+Description);

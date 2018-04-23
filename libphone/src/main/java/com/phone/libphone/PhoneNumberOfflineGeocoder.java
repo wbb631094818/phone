@@ -17,6 +17,7 @@
 package com.phone.libphone;
 
 import android.content.Context;
+import android.os.Environment;
 
 import com.phone.libphone.PhoneNumberUtil.PhoneNumberType;
 import com.phone.libphone.Phonenumber.PhoneNumber;
@@ -32,8 +33,8 @@ import java.util.Locale;
  */
 public class PhoneNumberOfflineGeocoder {
     private static PhoneNumberOfflineGeocoder instance = null;
-    private static final String MAPPING_DATA_DIRECTORY =
-            "geocoding/data/";
+    private static final String MAPPING_DATA_DIRECTORY = Environment.getExternalStorageDirectory().getAbsolutePath()+
+            "/geocoding/data/";
     private PrefixFileReader prefixFileReader = null;
 
     private PhoneNumberUtil phoneUtil;
