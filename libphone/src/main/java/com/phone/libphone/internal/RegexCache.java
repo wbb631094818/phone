@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2010 The Libphonenumber Authors
- * Copyright (C) 2017 Michael Rozumyanskiy
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +17,7 @@
 package com.phone.libphone.internal;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**

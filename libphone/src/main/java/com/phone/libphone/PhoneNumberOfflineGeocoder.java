@@ -26,6 +26,8 @@ import com.phone.libphone.prefixmapper.PrefixFileReader;
 import java.util.List;
 import java.util.Locale;
 
+import static com.phone.libphone.Util.MAPPING_DATA_DIRECTORY;
+
 /**
  * An offline geocoder which provides geographical information related to a phone number.
  *
@@ -33,17 +35,16 @@ import java.util.Locale;
  */
 public class PhoneNumberOfflineGeocoder {
     private static PhoneNumberOfflineGeocoder instance = null;
-    private static final String MAPPING_DATA_DIRECTORY = Environment.getExternalStorageDirectory().getAbsolutePath()+
-            "/geocoding/data/";
+
     private PrefixFileReader prefixFileReader = null;
 
     private PhoneNumberUtil phoneUtil;
 
     // @VisibleForTesting
-    private PhoneNumberOfflineGeocoder(Context context, String phonePrefixDataDirectory) {
-        prefixFileReader = new PrefixFileReader(context, phonePrefixDataDirectory);
+    private PhoneNumberOfflineGeocoder(String phonePrefixDataDirectory) {
+        prefixFileReader = new PrefixFileReader(phonePrefixDataDirectory);
         if (phoneUtil == null) {
-            phoneUtil = PhoneNumberUtil.createInstance(context);
+            phoneUtil = PhoneNumberUtil.getInstance();
         }
     }
 
@@ -56,9 +57,9 @@ public class PhoneNumberOfflineGeocoder {
      *
      * @return a {@link PhoneNumberOfflineGeocoder} instance
      */
-    public static synchronized PhoneNumberOfflineGeocoder getInstance(Context context) {
+    public static synchronized PhoneNumberOfflineGeocoder getInstance() {
         if (instance == null) {
-            instance = new PhoneNumberOfflineGeocoder(context, MAPPING_DATA_DIRECTORY);
+            instance = new PhoneNumberOfflineGeocoder(MAPPING_DATA_DIRECTORY);
         }
         return instance;
     }

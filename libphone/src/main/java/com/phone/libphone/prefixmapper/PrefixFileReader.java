@@ -39,8 +39,6 @@ import java.util.logging.Logger;
 public class PrefixFileReader {
     private static final Logger logger = Logger.getLogger(PrefixFileReader.class.getName());
 
-    private Context mContext;
-
     private final String phonePrefixDataDirectory;
     // The mappingFileProvider knows for which combination of countryCallingCode and language a phone
     // prefix mapping file is available in the file system, so that a file can be loaded when needed.
@@ -50,9 +48,8 @@ public class PrefixFileReader {
     private Map<String, PhonePrefixMap> availablePhonePrefixMaps =
             new HashMap<String, PhonePrefixMap>();
 
-    public PrefixFileReader(Context context, String phonePrefixDataDirectory) {
+    public PrefixFileReader(String phonePrefixDataDirectory) {
         this.phonePrefixDataDirectory = phonePrefixDataDirectory;
-        this.mContext = context;
         loadMappingFileProvider();
     }
 
@@ -89,7 +86,7 @@ public class PrefixFileReader {
             File file = new File(phonePrefixDataDirectory + fileName);
             InputStream source = new FileInputStream(file);
             in = new ObjectInputStream(source);
-            PhonePrefixMap map = new PhonePrefixMap(mContext);
+            PhonePrefixMap map = new PhonePrefixMap();
             map.readExternal(in);
             availablePhonePrefixMaps.put(fileName, map);
         } catch (IOException e) {

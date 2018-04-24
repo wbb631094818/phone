@@ -19,16 +19,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         String swissNumberStr = "+8618811021710";
-        PhoneNumberUtil phoneUtil = PhoneNumberUtil.createInstance(this);
+        PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
         try {
             Phonenumber.PhoneNumber swissNumberProto = phoneUtil.parse(swissNumberStr, "CN");
             String str = phoneUtil.format(swissNumberProto, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL);
-            PhoneNumberOfflineGeocoder geocoder = PhoneNumberOfflineGeocoder.getInstance(this);
+            PhoneNumberOfflineGeocoder geocoder = PhoneNumberOfflineGeocoder.getInstance();
 // Outputs "Zurich"
             String Description = geocoder.getDescriptionForNumber(swissNumberProto, Locale.ENGLISH);
 
 //            Phonenumber.PhoneNumber swissMobileNumber = new Phonenumber.PhoneNumber().setCountryCode(1).setNationalNumber(14783359524L);
-            PhoneNumberToCarrierMapper carrierMapper = PhoneNumberToCarrierMapper.getInstance(this);
+            PhoneNumberToCarrierMapper carrierMapper = PhoneNumberToCarrierMapper.getInstance();
 // Outputs "Swisscom"
             String carrier = carrierMapper.getNameForNumber(swissNumberProto, Locale.ENGLISH);
 

@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2009 The Libphonenumber Authors
- * Copyright (C) 2017 Michael Rozumyanskiy
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +16,15 @@
 
 package com.phone.libphone;
 
+import com.phone.libphone.Phonemetadata.NumberFormat;
+import com.phone.libphone.Phonemetadata.PhoneMetadata;
+import com.phone.libphone.internal.RegexCache;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.phone.libphone.Phonemetadata.NumberFormat;
-import com.phone.libphone.Phonemetadata.PhoneMetadata;
-import com.phone.libphone.internal.RegexCache;
 
 /**
  * A formatter which formats phone numbers as they are entered.
@@ -57,7 +56,7 @@ public class AsYouTypeFormatter {
   // true, we will no longer use local number formatting patterns.
   private boolean isCompleteNumber = false;
   private boolean isExpectingCountryCallingCode = false;
-  private final PhoneNumberUtil phoneUtil;
+  private final PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
   private String defaultCountry;
 
   // Character used when appropriate to separate a prefix, such as a long NDD or a country calling
@@ -124,11 +123,9 @@ public class AsYouTypeFormatter {
    * Constructs an as-you-type formatter. Should be obtained from {@link
    * PhoneNumberUtil#getAsYouTypeFormatter}.
    *
-   * @param phoneUtil   an instance of {@link PhoneNumberUtil}
    * @param regionCode  the country/region where the phone number is being entered
    */
-  AsYouTypeFormatter(PhoneNumberUtil phoneUtil, String regionCode) {
-    this.phoneUtil = phoneUtil;
+  AsYouTypeFormatter(String regionCode) {
     defaultCountry = regionCode;
     currentMetadata = getMetadataForRegion(defaultCountry);
     defaultMetadata = currentMetadata;

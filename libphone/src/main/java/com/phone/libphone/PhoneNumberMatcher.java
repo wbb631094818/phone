@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2011 The Libphonenumber Authors
- * Copyright (C) 2017 Michael Rozumyanskiy
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +16,19 @@
 
 package com.phone.libphone;
 
-import java.lang.Character.UnicodeBlock;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.phone.libphone.PhoneNumberUtil.Leniency;
 import com.phone.libphone.PhoneNumberUtil.MatchType;
 import com.phone.libphone.PhoneNumberUtil.PhoneNumberFormat;
 import com.phone.libphone.Phonemetadata.NumberFormat;
 import com.phone.libphone.Phonemetadata.PhoneMetadata;
-import com.phone.libphone.Phonenumber.PhoneNumber;
 import com.phone.libphone.Phonenumber.PhoneNumber.CountryCodeSource;
+import com.phone.libphone.Phonenumber.PhoneNumber;
+
+import java.lang.Character.UnicodeBlock;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A stateful class that finds and extracts telephone numbers from {@linkplain CharSequence text}.
@@ -584,7 +583,7 @@ final class PhoneNumberMatcher implements Iterator<PhoneNumberMatch> {
     }
     // If this didn't pass, see if there are any alternate formats, and try them instead.
     PhoneMetadata alternateFormats =
-        util.getMetadataSource().getAlternateFormatsForCountry(number.getCountryCode());
+        MetadataManager.getAlternateFormatsForCountry(number.getCountryCode());
     if (alternateFormats != null) {
       for (NumberFormat alternateFormat : alternateFormats.numberFormats()) {
         formattedNumberGroups = getNationalNumberGroups(util, number, alternateFormat);

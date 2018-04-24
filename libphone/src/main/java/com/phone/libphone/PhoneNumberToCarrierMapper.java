@@ -26,6 +26,8 @@ import com.phone.libphone.prefixmapper.PrefixFileReader;
 
 import java.util.Locale;
 
+import static com.phone.libphone.Util.MAPPING_DATA_DIRECTORY_CARRIER;
+
 /**
  * A phone prefix mapper which provides carrier information related to a phone number.
  *
@@ -33,20 +35,16 @@ import java.util.Locale;
  */
 public class PhoneNumberToCarrierMapper {
     private static PhoneNumberToCarrierMapper instance = null;
-    private static final String MAPPING_DATA_DIRECTORY = Environment.getExternalStorageDirectory().getAbsolutePath()+
-            "/carrier/data/";
+
     private PrefixFileReader prefixFileReader = null;
 
     private PhoneNumberUtil phoneUtil = null;
 
-    private Context mContext;
-
     // @VisibleForTesting
-    private PhoneNumberToCarrierMapper(Context context, String phonePrefixDataDirectory) {
-        this.mContext = context;
-        prefixFileReader = new PrefixFileReader(context, phonePrefixDataDirectory);
+    private PhoneNumberToCarrierMapper(String phonePrefixDataDirectory) {
+        prefixFileReader = new PrefixFileReader(phonePrefixDataDirectory);
         if (phoneUtil == null) {
-            phoneUtil = PhoneNumberUtil.createInstance(context);
+            phoneUtil = PhoneNumberUtil.getInstance();
         }
     }
 
@@ -58,9 +56,9 @@ public class PhoneNumberToCarrierMapper {
      *
      * @return a {@link PhoneNumberToCarrierMapper} instance
      */
-    public static synchronized PhoneNumberToCarrierMapper getInstance(Context context) {
+    public static synchronized PhoneNumberToCarrierMapper getInstance() {
         if (instance == null) {
-            instance = new PhoneNumberToCarrierMapper(context,MAPPING_DATA_DIRECTORY);
+            instance = new PhoneNumberToCarrierMapper(MAPPING_DATA_DIRECTORY_CARRIER);
         }
         return instance;
     }

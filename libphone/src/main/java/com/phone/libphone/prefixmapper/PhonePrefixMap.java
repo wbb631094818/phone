@@ -54,9 +54,9 @@ public class PhonePrefixMap implements Externalizable {
      * {@link Externalizable}. The empty map could later be populated by
      * {@link #readPhonePrefixMap(SortedMap)} or {@link #readExternal(ObjectInput)}.
      */
-    public PhonePrefixMap(Context context) {
+    public PhonePrefixMap() {
         if (phoneUtil == null) {
-            phoneUtil = PhoneNumberUtil.createInstance(context);
+            phoneUtil = PhoneNumberUtil.getInstance();
         }
     }
 

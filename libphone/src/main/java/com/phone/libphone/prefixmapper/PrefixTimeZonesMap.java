@@ -37,7 +37,6 @@ import java.util.StringTokenizer;
 public class PrefixTimeZonesMap implements Externalizable {
     private PhonePrefixMap phonePrefixMap;
     private static final String RAW_STRING_TIMEZONES_SEPARATOR = "&";
-    private Context mContext;
 
     /**
      * Creates a {@link PrefixTimeZonesMap} initialized with {@code sortedPrefixTimeZoneMap}.  Note
@@ -52,9 +51,8 @@ public class PrefixTimeZonesMap implements Externalizable {
     }
 
     public PrefixTimeZonesMap(Context context) {
-        this.mContext = context;
         if (phonePrefixMap == null) {
-            phonePrefixMap = new PhonePrefixMap(context);
+            phonePrefixMap = new PhonePrefixMap();
         }
     }
 
@@ -99,7 +97,7 @@ public class PrefixTimeZonesMap implements Externalizable {
      */
     public List<String> lookupTimeZonesForNumber(PhoneNumber number) {
         long phonePrefix = Long.parseLong(number.getCountryCode()
-                + PhoneNumberUtil.createInstance(mContext).getNationalSignificantNumber(number));
+                + PhoneNumberUtil.getInstance().getNationalSignificantNumber(number));
         return lookupTimeZonesForNumber(phonePrefix);
     }
 

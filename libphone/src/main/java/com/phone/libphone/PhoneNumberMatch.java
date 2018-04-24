@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2011 The Libphonenumber Authors
- * Copyright (C) 2017 Michael Rozumyanskiy
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +16,9 @@
 
 package com.phone.libphone;
 
-import java.util.Arrays;
-
 import com.phone.libphone.Phonenumber.PhoneNumber;
+
+import java.util.Arrays;
 
 /**
  * The immutable match of a phone number within a piece of text. Matches may be found using

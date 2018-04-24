@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2009 The Libphonenumber Authors
- * Copyright (C) 2017 Michael Rozumyanskiy
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +16,19 @@
 
 package com.phone.libphone;
 
-import android.content.Context;
+import com.phone.libphone.Phonemetadata.NumberFormat;
+import com.phone.libphone.Phonemetadata.PhoneMetadata;
+import com.phone.libphone.Phonemetadata.PhoneNumberDesc;
+import com.phone.libphone.Phonenumber.PhoneNumber;
+import com.phone.libphone.Phonenumber.PhoneNumber.CountryCodeSource;
+import com.phone.libphone.internal.MatcherApi;
+import com.phone.libphone.internal.RegexBasedMatcher;
+import com.phone.libphone.internal.RegexCache;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -33,15 +40,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.phone.libphone.Phonemetadata.NumberFormat;
-import com.phone.libphone.Phonemetadata.PhoneMetadata;
-import com.phone.libphone.Phonemetadata.PhoneNumberDesc;
-import com.phone.libphone.Phonenumber.PhoneNumber;
-import com.phone.libphone.Phonenumber.PhoneNumber.CountryCodeSource;
-import com.phone.libphone.internal.MatcherApi;
-import com.phone.libphone.internal.RegexBasedMatcher;
-import com.phone.libphone.internal.RegexCache;
 
 /**
  * Utility for international phone numbers. Functionality includes formatting, parsing and
@@ -376,6 +374,8 @@ public class PhoneNumberUtil {
   // for unbalanced parentheses.
   private static final Pattern FIRST_GROUP_ONLY_PREFIX_PATTERN = Pattern.compile("\\(?\\$1\\)?");
 
+  private static PhoneNumberUtil instance = null;
+
   public static final String REGION_CODE_FOR_NON_GEO_ENTITY = "001";
 
   /**
@@ -576,9 +576,6 @@ public class PhoneNumberUtil {
   // A source of metadata for different regions.
   private final MetadataSource metadataSource;
 
-  // A helper class for getting information about short phone numbers.
-  private volatile ShortNumberInfo shortNumberInfo;
-
   // A mapping from a country calling code to the region codes which denote the region represented
   // by that country calling code. In the case of multiple regions sharing a calling code, such as
   // the NANPA regions, the one indicated with "isMainCountryForCode" in the metadata should be
@@ -635,21 +632,6 @@ public class PhoneNumberUtil {
           + "entity as well as specific region(s))");
     }
     nanpaRegions.addAll(countryCallingCodeToRegionCodeMap.get(NANPA_COUNTRY_CODE));
-  }
-
-  MetadataSource getMetadataSource() {
-    return metadataSource;
-  }
-
-  public ShortNumberInfo getShortNumberInfo() {
-    if (shortNumberInfo == null) {
-      synchronized (this) {
-        if (shortNumberInfo == null) {
-          shortNumberInfo = new ShortNumberInfo(metadataSource, RegexBasedMatcher.create());
-        }
-      }
-    }
-    return shortNumberInfo;
   }
 
   /**
@@ -960,6 +942,15 @@ public class PhoneNumberUtil {
   }
 
   /**
+   * Sets or resets the PhoneNumberUtil singleton instance. If set to null, the next call to
+   * {@code getInstance()} will load (and return) the default instance.
+   */
+  // @VisibleForTesting
+  static synchronized void setInstance(PhoneNumberUtil util) {
+    instance = util;
+  }
+
+  /**
    * Returns all regions the library has metadata for.
    *
    * @return  an unordered set of the two-letter region codes for every geographical region the
@@ -1073,41 +1064,19 @@ public class PhoneNumberUtil {
   }
 
   /**
-   * Create a new {@link PhoneNumberUtil} instance to carry out international phone number
-   * formatting, parsing, or validation. The instance is loaded with all metadata by
-   * using the metadataSource specified.
+   * Gets a {@link PhoneNumberUtil} instance to carry out international phone number formatting,
+   * parsing, or validation. The instance is loaded with all phone number metadata.
    *
-   * <p>Calling this method multiple times is very expensive, as each time a new instance is created
-   * from scratch.
+   * <p>The {@link PhoneNumberUtil} is implemented as a singleton. Therefore, calling getInstance
+   * multiple times will only result in one instance being created.
    *
-   * @param context  Android {@link Context} used to load metadata. This should not be null.
-   * @return  a PhoneNumberUtil instance
+   * @return a PhoneNumberUtil instance
    */
-  public static PhoneNumberUtil createInstance(Context context) {
-    if (context == null) {
-      throw new IllegalArgumentException("context could not be null.");
+  public static synchronized PhoneNumberUtil getInstance() {
+    if (instance == null) {
+      setInstance(createInstance(MetadataManager.DEFAULT_METADATA_LOADER));
     }
-    return createInstance(new AssetsMetadataLoader(context.getAssets()));
-  }
-
-  /**
-   * Create a new {@link PhoneNumberUtil} instance to carry out international phone number
-   * formatting, parsing, or validation. The instance is loaded with all metadata by
-   * using the metadataSource specified.
-   *
-   * <p>This method should only be used in the rare case in which you want to manage your own
-   * metadata loading. Calling this method multiple times is very expensive, as each time
-   * a new instance is created from scratch.
-   *
-   * @param metadataSource  Customized metadata source. This should not be null.
-   * @return  a PhoneNumberUtil instance
-   */
-  public static PhoneNumberUtil createInstance(MetadataSource metadataSource) {
-    if (metadataSource == null) {
-      throw new IllegalArgumentException("metadataSource could not be null.");
-    }
-    return new PhoneNumberUtil(metadataSource,
-        CountryCodeToRegionCodeMap.getCountryCodeToRegionCodeMap());
+    return instance;
   }
 
   /**
@@ -1117,9 +1086,9 @@ public class PhoneNumberUtil {
    *
    * <p>This method should only be used in the rare case in which you want to manage your own
    * metadata loading. Calling this method multiple times is very expensive, as each time
-   * a new instance is created from scratch.
+   * a new instance is created from scratch. When in doubt, use {@link #getInstance}.
    *
-   * @param metadataLoader  Customized metadata loader. This should not be null.
+   * @param metadataLoader  customized metadata loader. This should not be null
    * @return  a PhoneNumberUtil instance
    */
   public static PhoneNumberUtil createInstance(MetadataLoader metadataLoader) {
@@ -1127,6 +1096,26 @@ public class PhoneNumberUtil {
       throw new IllegalArgumentException("metadataLoader could not be null.");
     }
     return createInstance(new MultiFileMetadataSourceImpl(metadataLoader));
+  }
+
+  /**
+   * Create a new {@link PhoneNumberUtil} instance to carry out international phone number
+   * formatting, parsing, or validation. The instance is loaded with all metadata by
+   * using the metadataSource specified.
+   *
+   * <p>This method should only be used in the rare case in which you want to manage your own
+   * metadata loading. Calling this method multiple times is very expensive, as each time
+   * a new instance is created from scratch. When in doubt, use {@link #getInstance}.
+   *
+   * @param metadataSource  customized metadata source. This should not be null
+   * @return  a PhoneNumberUtil instance
+   */
+  private static PhoneNumberUtil createInstance(MetadataSource metadataSource) {
+    if (metadataSource == null) {
+      throw new IllegalArgumentException("metadataSource could not be null.");
+    }
+    return new PhoneNumberUtil(metadataSource,
+        CountryCodeToRegionCodeMap.getCountryCodeToRegionCodeMap());
   }
 
   /**
@@ -1434,9 +1423,9 @@ public class PhoneNumberUtil {
           formattedNumber = format(numberNoExt, PhoneNumberFormat.NATIONAL);
         }
       } else {
-        // For non-geographical countries, and Mexican and Chilean fixed line and mobile numbers, we
-        // output international format for numbers that can be dialed internationally as that always
-        // works.
+        // For non-geographical countries, and Mexican, Chilean, and Uzbek fixed line and mobile
+        // numbers, we output international format for numbers that can be dialed internationally as
+        // that always works.
         if ((regionCode.equals(REGION_CODE_FOR_NON_GEO_ENTITY)
              // MX fixed line and mobile numbers should always be formatted in international format,
              // even when dialed within MX. For national format to work, a carrier code needs to be
@@ -1446,8 +1435,13 @@ public class PhoneNumberUtil {
              // CL fixed line numbers need the national prefix when dialing in the national format,
              // but don't have it when used for display. The reverse is true for mobile numbers.  As
              // a result, we output them in the international format to make it work.
-             || ((regionCode.equals("MX") || regionCode.equals("CL"))
-             && isFixedLineOrMobile))
+             // UZ mobile and fixed-line numbers have to be formatted in international format or
+             // prefixed with special codes like 03, 04 (for fixed-line) and 05 (for mobile) for
+             // dialling successfully from mobile devices. As we do not have complete information on
+             // special codes and to be consistent with formatting across all phone types we return
+             // the number in international format here.
+             || ((regionCode.equals("MX") || regionCode.equals("CL")
+                 || regionCode.equals("UZ")) && isFixedLineOrMobile))
             && canBeInternationallyDialled(numberNoExt)) {
           formattedNumber = format(numberNoExt, PhoneNumberFormat.INTERNATIONAL);
         } else {
@@ -1958,7 +1952,7 @@ public class PhoneNumberUtil {
    * where you want to test what will happen with an invalid number. Note that the number that is
    * returned will always be able to be parsed and will have the correct country code. It may also
    * be a valid *short* number/code for this region. Validity checking such numbers is handled with
-   * {@link ShortNumberInfo}.
+   * {@link com.phone.libphone.ShortNumberInfo}.
    *
    * @param regionCode  the region for which an example number is needed
    * @return  an invalid number for the specified region. Returns null when an unsupported region or
@@ -2695,14 +2689,14 @@ public class PhoneNumberUtil {
   }
 
   /**
-   * Gets an {@link AsYouTypeFormatter} for the specific region.
+   * Gets an {@link com.phone.libphone.AsYouTypeFormatter} for the specific region.
    *
    * @param regionCode  the region where the phone number is being entered
-   * @return  an {@link AsYouTypeFormatter} object, which can be used
+   * @return  an {@link com.phone.libphone.AsYouTypeFormatter} object, which can be used
    *     to format phone numbers in the specific region "as you type"
    */
   public AsYouTypeFormatter getAsYouTypeFormatter(String regionCode) {
-    return new AsYouTypeFormatter(this, regionCode);
+    return new AsYouTypeFormatter(regionCode);
   }
 
   // Extracts country calling code from fullNumber, returns it and places the remaining number in
@@ -2997,7 +2991,7 @@ public class PhoneNumberUtil {
    * interpreted with the defaultRegion supplied. It also attempts to convert any alpha characters
    * into digits if it thinks this is a vanity number of the type "1800 MICROSOFT".
    *
-   * <p> This method will throw a {@link NumberParseException} if the
+   * <p> This method will throw a {@link com.phone.libphone.NumberParseException} if the
    * number is not considered to be a possible number. Note that validation of whether the number
    * is actually a valid number for a particular region is not performed. This can be done
    * separately with {@link #isValidNumber}.

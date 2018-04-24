@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2015 The Libphonenumber Authors
- * Copyright (C) 2017 Michael Rozumyanskiy
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,17 +36,4 @@ interface MetadataSource {
    * @return the phone metadata for that region, or null if there is none.
    */
   PhoneMetadata getMetadataForNonGeographicalRegion(int countryCallingCode);
-
-  /**
-   * Gets alternative phone metadata for a non-geographical region.
-   * @param countryCallingCode the country calling code.
-   * @return the phone metadata for that region, or null if there is none.
-   */
-  PhoneMetadata getAlternateFormatsForCountry(int countryCallingCode);
-  /**
-   * Gets short number phone metadata for a region.
-   * @param regionCode the region code.
-   * @return the phone metadata for that region, or null if there is none.
-   */
-  PhoneMetadata getShortNumberMetadataForRegion(String regionCode);
 }
